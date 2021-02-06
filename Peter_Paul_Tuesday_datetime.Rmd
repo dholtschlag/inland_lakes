@@ -1,0 +1,120 @@
+---
+title: "Peter, Paul, and Tuesday Lakes"
+author: "David J Holtschlag"
+date: "2/6/2021"
+output: 
+  html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(lubridate)
+knitr::opts_chunk$set(echo = FALSE, fig.width = 10, fig.height = 9, warning = FALSE)
+```
+
+## Read sample data
+
+```{r read_df}
+pathfile <- "D:/USGS/Inland_Lakes/Ground_Truth/knb-lter-ntl.371.2/knb_lter_ntl_371_2_1kSample.txt"
+df       <- read.csv(file = pathfile, header = TRUE)
+df$Lake  <- recode(df$Lake, 'L' = 'Peter', 'R' = 'Paul', 'T' = 'Tuesday')
+
+# Notice subtle time correction involving rounding and adding small value
+df$datetime     <- as.Date(round(df$DoY,5)-1+5e-6, origin = paste0(df$Year,'-01-01'), format = '%Y-%m-%d')
+lubridate::tz(df$datetime) <- 'America/Detroit'
+
+fig_no <- 0
+
+head(df)
+
+```
+
+
+### Water Temperature
+
+```{r plot_TEMP_ysi }
+
+fig_no <- fig_no + 1
+
+df %>% 
+  ggplot( aes( x = datetime, y = Temp_YSI)) +
+  geom_point( color = 'coral3', size = 1 ) + 
+  scale_color_gradient2( trans = "reverse") +
+  facet_grid( vars(Lake), vars(Year),  scales = 'free_x' ) +
+  ylab('YSI Water Temperture, in degrees Celcius') +
+  ggtitle(paste0('Figure ', fig_no, '. Water Temperatures at Paul, Peter, and Tuesday Lakes in the \nUpper Peninsula of Michigan' ))
+  
+```
+
+### Phycocyanin (BGA)
+
+```{r plot_BGA_YSI }
+fig_no <- fig_no + 1
+
+df %>% 
+  ggplot( aes( x = datetime, y = BGA_YSI)) +
+  geom_point( color = 'coral3', size = 1 ) + 
+  scale_color_gradient2( trans = "reverse") +
+  scale_y_log10() +
+  facet_grid( vars(Lake), vars(Year),  scales = 'free' ) +
+  ylab('Phycocyanin (BGA), in Relative Fluorescence Units') +
+  ggtitle(paste('Figure ', fig_no, '. Phycocyanin at Paul, Peter, and Tuesday Lakes in the \nUpper Peninsula of Michigan' ))
+
+```
+  
+  
+### Dissolved Oxygen
+
+```{r plot_DO_YSI }
+
+fig_no <- fig_no + 1
+
+df %>% 
+  ggplot( aes( x = datetime, y = DO_YSI)) +
+  geom_point( color = 'coral3', size = 1 ) + 
+  scale_color_gradient2( trans = "reverse") +
+  facet_grid( vars(Lake), vars(Year),  scales = 'free_x' ) +
+  ylab('Dissolved Oxygen, in milligrams per liter') +
+  ggtitle(paste0('Figure ', fig_no, '. Dissolved Oxygern Concentrations at Paul, Peter, and Tuesday Lakes in the \nUpper Peninsula of Michigan' ))
+  
+
+```
+
+  
+### pH
+
+```{r plot_PH_YSI }
+
+fig_no <- fig_no + 1
+
+df %>% 
+  ggplot( aes( x = datetime, y = PH_YSI)) +
+  geom_point( color = 'coral3', size = 1 ) + 
+  scale_color_gradient2( trans = "reverse") +
+  facet_grid( vars(Lake), vars(Year),  scales = 'free_x' ) +
+  ylab('pH') +
+  ggtitle(paste0('Figure ', fig_no, '. pH at Paul, Peter, and Tuesday Lakes in the \nUpper Peninsula of Michigan' ))
+  
+
+```
+
+### Chlorophyll A
+
+```{r plot_chl_YSI }
+
+fig_no <- fig_no + 1
+
+df %>% 
+  ggplot( aes( x = datetime, y = Chl_YSI)) +
+  geom_point( color = 'coral3', size = 1 ) + 
+  scale_color_gradient2( trans = "reverse") +
+  scale_y_sqrt() +
+  facet_grid( vars(Lake), vars(Year),  scales = 'free_x' ) +
+  ylab('Chlorophyll A Concentration, in micrograms Per Liter') +
+  ggtitle(paste0('Figure ', fig_no, '. Chlorophyll A at Paul, Peter, and Tuesday Lakes in the \nUpper Peninsula of Michigan' ))
+  
+
+```
+
+
+
